@@ -29,17 +29,22 @@ const featureLabels = {
     }
 };
 
+// Exact columns exposed by the public_tractors view — no sensitive fields
+const PUBLIC_COLUMNS = `
+    id, vehicle_type, make, model_number,
+    manufacturing_date, parsing_year, engine_hours,
+    images, status, number_plate, product_details, created_at
+`;
+
 // Helper to map DB row to UI-friendly object
 const mapTractorToUI = (tractor) => {
     const details = tractor.product_details || {};
     const hasCustomFeatures = details.features && details.features.length > 0;
 
-    // Build features from product_details if available
     const buildFeatures = (lang) => {
         if (hasCustomFeatures) {
             return details.features.map(fId => featureLabels[lang]?.[fId] || fId);
         }
-        // Fallback to auto-generated
         return lang === 'en'
             ? [`Model Year: ${tractor.manufacturing_date || 'N/A'}`, `Engine Hours: ${tractor.engine_hours || 'N/A'}`, "Verified Inspection", "Finance Available"]
             : [`મોડેલ વર્ષ: ${tractor.manufacturing_date || 'N/A'}`, `એન્જિન કલાકો: ${tractor.engine_hours || 'N/A'}`, "ચકાસાયેલ નિરીક્ષણ", "ફાઇનાન્સ ઉપલબ્ધ"];
@@ -51,8 +56,8 @@ const mapTractorToUI = (tractor) => {
         brand: tractor.make || 'Unknown Brand',
         numberPlate: tractor.number_plate || '',
         model: {
-            en: tractor.model_number || tractor.model_name || 'Unknown Model',
-            gu: tractor.model_number || tractor.model_name || 'અજ્ઞાત મોડેલ'
+            en: tractor.model_number || 'Unknown Model',
+            gu: tractor.model_number || 'અજ્ઞાત મોડેલ'
         },
         images: parseImages(tractor.images).length > 0
             ? parseImages(tractor.images)
@@ -69,29 +74,27 @@ const mapTractorToUI = (tractor) => {
     };
 };
 
-// Fetch all available products (original function)
+// Fetch all available products
+// → public_tractors view: only safe columns, status='available' enforced by the view
 export const fetchTractors = async () => {
     const { data, error } = await supabase
-        .from('tractors')
-        .select('*')
-        .eq('status', 'available')
+        .from('public_tractors')
+        .select(PUBLIC_COLUMNS)
         .order('created_at', { ascending: false });
 
     if (error) throw new Error(error.message);
     return data.map(mapTractorToUI);
 };
 
-// Fetch distinct brands for a given vehicle_type (Tractor, Trolley, Other)
+// Fetch distinct brands for a given vehicle_type
 export const fetchBrandsByCategory = async (vehicleType) => {
     const { data, error } = await supabase
-        .from('tractors')
+        .from('public_tractors')
         .select('make')
-        .eq('vehicle_type', vehicleType)
-        .eq('status', 'available');
+        .eq('vehicle_type', vehicleType);
 
     if (error) throw new Error(error.message);
 
-    // Extract unique brand names
     const brands = [...new Set(data.map(item => item.make).filter(Boolean))];
     return brands.sort();
 };
@@ -99,9 +102,8 @@ export const fetchBrandsByCategory = async (vehicleType) => {
 // Fetch all available products grouped by vehicle_type
 export const fetchAllInventory = async () => {
     const { data, error } = await supabase
-        .from('tractors')
-        .select('*')
-        .eq('status', 'available')
+        .from('public_tractors')
+        .select(PUBLIC_COLUMNS)
         .order('created_at', { ascending: false });
 
     if (error) throw new Error(error.message);
@@ -118,22 +120,22 @@ export const fetchAllInventory = async () => {
 // Fetch all available products for a specific brand & vehicle type
 export const fetchProductsByBrand = async (vehicleType, brand) => {
     const { data, error } = await supabase
-        .from('tractors')
-        .select('*')
+        .from('public_tractors')
+        .select(PUBLIC_COLUMNS)
         .eq('vehicle_type', vehicleType)
         .eq('make', brand)
-        .eq('status', 'available')
         .order('created_at', { ascending: false });
 
     if (error) throw new Error(error.message);
     return data.map(mapTractorToUI);
 };
 
-// Fetch a single product by ID
+// Fetch a single available product by ID
+// (view only exposes status='available' → sold products are automatically inaccessible)
 export const fetchProductById = async (id) => {
     const { data, error } = await supabase
-        .from('tractors')
-        .select('*')
+        .from('public_tractors')
+        .select(PUBLIC_COLUMNS)
         .eq('id', id)
         .single();
 

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, X, Save, Loader2, Check, Trash2, Lock, ChevronDown } from 'lucide-react';
+import { Camera, X, Save, Loader2, Check, Lock, ChevronDown, LogOut, AlertCircle, Home } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { fetchAllTractorsForAdmin, saveProductDetails } from '@/api/admin';
 import { uploadImage } from '@/api/cloudinary';
-
-const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN;
+import { supabase } from '@/lib/supabase';
 
 // Feature options for checkboxes
 const FEATURE_OPTIONS = [
@@ -41,9 +41,13 @@ const ENGINE_OPTIONS = [
 
 export default function Admin() {
     // Auth state
-    const [pin, setPin] = useState('');
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [pinError, setPinError] = useState(false);
+    const [session, setSession] = useState(null);
+    const [authLoading, setAuthLoading] = useState(true);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loginError, setLoginError] = useState('');
+    const [loginLoading, setLoginLoading] = useState(false);
+    const navigate = useNavigate();
 
     // Data state
     const [tractors, setTractors] = useState([]);
@@ -68,21 +72,45 @@ export default function Admin() {
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [saveError, setSaveError] = useState('');
 
-    // PIN check
-    const handlePinSubmit = (e) => {
+    // Restore session on mount + listen for auth changes
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session);
+            setAuthLoading(false);
+        });
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    // Login handler
+    const handleLogin = async (e) => {
         e.preventDefault();
-        if (pin === ADMIN_PIN) {
-            setIsAuthenticated(true);
-            setPinError(false);
-        } else {
-            setPinError(true);
-            setPin('');
+        setLoginLoading(true);
+        setLoginError('');
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+            setLoginError('Invalid email or password. Please try again.');
+            setPassword('');
         }
+        setLoginLoading(false);
     };
 
-    // Load tractors
+    // Sign out handler
+    const handleSignOut = async () => {
+        await supabase.auth.signOut();
+        setSelectedTractorId('');
+        setImages([]);
+        setTractors([]);
+    };
+
+    // Load tractors once authenticated
     useEffect(() => {
-        if (!isAuthenticated) return;
+        if (!session) return;
+        setLoading(true);
         const load = async () => {
             try {
                 const data = await fetchAllTractorsForAdmin();
@@ -94,7 +122,7 @@ export default function Admin() {
             }
         };
         load();
-    }, [isAuthenticated]);
+    }, [session]);
 
     // When a tractor is selected, load its existing data
     useEffect(() => {
@@ -202,8 +230,17 @@ export default function Admin() {
         }
     };
 
-    // PIN Gate
-    if (!isAuthenticated) {
+    // Checking session on first load
+    if (authLoading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-[#1e3a5f] animate-spin" />
+            </div>
+        );
+    }
+
+    // Login Gate
+    if (!session) {
         return (
             <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col items-center justify-center p-6">
                 <motion.h1
@@ -223,37 +260,62 @@ export default function Admin() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center"
+                    className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm"
                 >
                     <div className="w-16 h-16 bg-[#1e3a5f] rounded-2xl flex items-center justify-center mx-auto mb-6">
                         <Lock className="w-8 h-8 text-white" />
                     </div>
-                    <h1 className="text-2xl font-black text-[#1e3a5f] mb-2">Admin Access</h1>
-                    <p className="text-slate-500 text-sm mb-6">Enter PIN to continue</p>
+                    <h1 className="text-2xl font-black text-[#1e3a5f] mb-1 text-center">Admin Access</h1>
+                    <p className="text-slate-500 text-sm mb-6 text-center">Sign in to manage products</p>
 
-                    <form onSubmit={handlePinSubmit}>
-                        <input
-                            type="password"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            maxLength={6}
-                            value={pin}
-                            onChange={(e) => setPin(e.target.value)}
-                            placeholder="Enter PIN"
-                            className={`w-full text-center text-2xl tracking-[0.5em] font-bold border-2 rounded-xl px-4 py-4 outline-none transition-colors ${pinError ? 'border-red-400 bg-red-50' : 'border-slate-200 focus:border-[#1e3a5f]'
-                                }`}
-                            autoFocus
-                        />
-                        {pinError && (
-                            <p className="text-red-500 text-sm mt-2">Incorrect PIN. Try again.</p>
+                    <form onSubmit={handleLogin} className="space-y-4">
+                        <div>
+                            <label className="block text-xs font-semibold text-slate-500 mb-1">Email</label>
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="admin@example.com"
+                                required
+                                className="w-full border-2 border-slate-200 focus:border-[#1e3a5f] rounded-xl px-4 py-3 outline-none transition-colors text-sm font-medium"
+                                autoFocus
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-semibold text-slate-500 mb-1">Password</label>
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="••••••••"
+                                required
+                                className="w-full border-2 border-slate-200 focus:border-[#1e3a5f] rounded-xl px-4 py-3 outline-none transition-colors text-sm font-medium"
+                            />
+                        </div>
+
+                        {loginError && (
+                            <div className="flex items-center gap-2 text-red-500 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                {loginError}
+                            </div>
                         )}
+
                         <button
                             type="submit"
-                            className="w-full mt-4 bg-[#1e3a5f] hover:bg-[#152a45] text-white px-6 py-3 rounded-xl font-bold transition-colors"
+                            disabled={loginLoading}
+                            className="w-full bg-[#1e3a5f] hover:bg-[#152a45] disabled:opacity-60 text-white px-6 py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
                         >
-                            Unlock
+                            {loginLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Signing in...</> : 'Sign In'}
                         </button>
                     </form>
+
+                    <button
+                        onClick={() => navigate('/')}
+                        className="w-full mt-4 flex items-center justify-center gap-2 text-slate-400 hover:text-[#1e3a5f] text-sm font-medium transition-colors py-2"
+                    >
+                        <Home className="w-4 h-4" />
+                        Back to Home
+                    </button>
                 </motion.div>
             </div>
         );
@@ -265,9 +327,18 @@ export default function Admin() {
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white font-sans">
             {/* Header */}
             <div className="bg-[#1e3a5f] text-white px-6 py-6">
-                <div className="max-w-2xl mx-auto">
-                    <h1 className="text-2xl font-black">🚜 Product Manager</h1>
-                    <p className="text-white/60 text-sm mt-1">Upload photos & add product details</p>
+                <div className="max-w-2xl mx-auto flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-black">🚜 Product Manager</h1>
+                        <p className="text-white/60 text-sm mt-1">{session?.user?.email}</p>
+                    </div>
+                    <button
+                        onClick={handleSignOut}
+                        className="flex items-center gap-2 text-white/70 hover:text-white text-sm font-medium transition-colors bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl"
+                    >
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
+                    </button>
                 </div>
             </div>
 

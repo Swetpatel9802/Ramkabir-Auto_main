@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Phone, MessageSquare, ChevronLeft, ChevronRight, X, Share2, Share, AlertCircle } from 'lucide-react';
@@ -69,12 +69,14 @@ const engineLabels = {
 export default function ProductPage() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const [language, setLanguage] = useState('gu');
     const t = pageContent[language];
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [fullscreenImage, setFullscreenImage] = useState(false);
     const [showCopied, setShowCopied] = useState(false);
+    const returnPath = location.state?.from || '/inventory';
 
     const { data: tractor, isLoading, error } = useQuery({
         queryKey: ['product', id],
@@ -155,6 +157,15 @@ export default function ProductPage() {
         }
     };
 
+    const handleBack = useCallback(() => {
+        if (location.state?.from) {
+            navigate(-1);
+            return;
+        }
+
+        navigate(returnPath);
+    }, [location.state, navigate, returnPath]);
+
     const getLabel = (value, labels) => labels[language]?.[value] || value;
 
     if (isLoading) {
@@ -175,7 +186,7 @@ export default function ProductPage() {
                     <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
                     <div className="text-xl text-slate-700 mb-6 font-semibold">{t.error}</div>
                     <button
-                        onClick={() => navigate('/inventory')}
+                        onClick={handleBack}
                         className="flex items-center gap-2 bg-[#1e3a5f] text-white px-6 py-3 rounded-full hover:bg-[#1e3a5f]/90 transition-colors"
                     >
                         <ArrowLeft className="w-5 h-5" />
@@ -196,7 +207,7 @@ export default function ProductPage() {
                 <div className="bg-[#1e3a5f] text-white sticky top-0 z-30 shadow-md">
                     <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
                         <button
-                            onClick={() => navigate('/inventory')}
+                            onClick={handleBack}
                             className="flex items-center gap-2 text-white/90 hover:text-white transition-colors group"
                         >
                             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
