@@ -283,9 +283,12 @@ export default function Contact() {
             </div>
           </div>
 
-          <div className="mt-16 overflow-hidden flex justify-center w-full pointer-events-none select-none opacity-60 px-4 md:px-0">
-            <h1 className="text-[4vw] sm:text-[12vw] md:text-[10vw] lg:text-[9.5vw] font-black text-[#22c55e] leading-tight tracking-normal whitespace-nowrap">
-              Ramkabir Auto<sup className="text-[1vw] relative -top-[1vw]"></sup>
+          <div className="w-full px-4 overflow-visible">
+            <h1
+              className="w-full font-black text-[#7BD88A] leading-none tracking-tight text-center whitespace-normal break-words"
+              style={{ fontSize: "min(10vw, 9rem)" }}
+            >
+              Ramkabir Auto
             </h1>
           </div>
         </motion.div>
