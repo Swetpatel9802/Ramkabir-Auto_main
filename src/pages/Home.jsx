@@ -6,7 +6,8 @@ import Tractors from '@/components/landing/Tractors';
 import Testimonials from '@/components/landing/Testimonials';
 import Contact from '@/components/landing/Contact';
 import WhatsAppButton from '@/components/landing/WhatsAppButton';
-import LanguageToggle from '@/components/landing/LanguageToggle';
+
+import Navbar from '@/components/landing/Navbar';
 
 export const LanguageContext = createContext({ language: 'en', setLanguage: (_lang) => { } });
 
@@ -24,16 +25,24 @@ export default function Home() {
   return (
     <LanguageContext.Provider value={{ language, setLanguage }}>
       <div className="min-h-screen bg-white font-sans">
-        {/* Language Toggle */}
-        <LanguageToggle />
+        {/* Transparent Navbar */}
+        <Navbar />
 
         {/* Main Sections */}
-        <Hero />
-        <About />
+        <section id="home">
+          <Hero />
+        </section>
+        <section id="about">
+          <About />
+        </section>
         <Brands />
-        <Tractors />
+        <section id="tractors">
+          <Tractors />
+        </section>
         <Testimonials />
-        <Contact />
+        <section id="contact">
+          <Contact />
+        </section>
 
         {/* Floating WhatsApp Button */}
         <WhatsAppButton />

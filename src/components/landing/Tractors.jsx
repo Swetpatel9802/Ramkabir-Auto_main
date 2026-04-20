@@ -55,7 +55,7 @@ const content = {
     bannerTitle: "અમારો સંપૂર્ણ સંગ્રહ જુઓ",
     bannerSub: "ટ્રેક્ટર, ટ્રોલી અને વધુ — બધું એક જગ્યાએ",
     productsAvailable: "ઉત્પાદનો ઉપલબ્ધ",
-    browseAll: "બધા ઉત્પાદનો જુઓ",
+    browseAll: "બધા સાધનો જુઓ",
     or: "અથવા",
     orSub: "પસંદીદા બ્રાન્ડ પ્રમાણે જુઓ"
   }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLanguage } from '@/pages/Home';
-import { Phone, ChevronDown, Settings } from 'lucide-react';
+import { Phone, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -41,14 +41,7 @@ export default function Hero() {
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#2d5a3d]/20 rounded-full blur-3xl" />
       </div>
 
-      {/* Admin Link — top left */}
-      <Link
-        to="/admin"
-        className="absolute top-4 left-4 z-20 flex items-center gap-1.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white/70 hover:text-white px-3 py-1.5 rounded-full text-xs font-medium transition-all"
-      >
-        <Settings className="w-3.5 h-3.5" />
-        Admin Login
-      </Link>
+
 
       {/* Content */}
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-20 text-center">

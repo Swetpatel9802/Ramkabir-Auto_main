@@ -2,7 +2,6 @@ import React from 'react';
 import { useLanguage } from '@/pages/Home';
 import { motion } from 'framer-motion';
 import { Phone, MapPin, Clock, User, Navigation } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 const content = {
   en: {
@@ -18,11 +17,7 @@ const content = {
     directions: "Get Directions",
     footerOpeningHours: "Opening Hours",
     footerContact: "Contact",
-    footerGeneral: "General",
     footerLocation: "Location",
-    footerHome: "Home",
-    footerInventory: "Vehicles",
-    footerAbout: "About us"
   },
   gu: {
     badge: "સંપર્કમાં રહો",
@@ -37,11 +32,7 @@ const content = {
     directions: "દિશાઓ મેળવો",
     footerOpeningHours: "ખુલવાનો સમય",
     footerContact: "સંપર્ક",
-    footerGeneral: "સામાન્ય",
     footerLocation: "સ્થળ",
-    footerHome: "હોમ",
-    footerInventory: "વાહનો",
-    footerAbout: "અમારા વિશે"
   }
 };
 
@@ -61,7 +52,7 @@ export default function Contact() {
       {/* Glassmorphism top border */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
 
-      {/* Mesh Gradient Arc — smooth horizon shape */}
+      {/* Mesh Gradient Arc */}
       <motion.div
         initial={{ opacity: 0, y: 120 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -70,7 +61,6 @@ export default function Contact() {
         className="absolute bottom-0 left-0 right-0 pointer-events-none"
         style={{ height: '350px' }}
       >
-        {/* Main arc — ellipse shape */}
         <div style={{
           position: 'absolute',
           bottom: '-60%',
@@ -81,7 +71,6 @@ export default function Contact() {
           borderRadius: '50%',
           overflow: 'hidden',
         }}>
-          {/* Gradient bands inside the arc */}
           <div style={{
             position: 'absolute',
             inset: 0,
@@ -95,7 +84,6 @@ export default function Contact() {
             filter: 'blur(60px)',
             animation: 'meshShift 12s ease-in-out infinite alternate',
           }} />
-          {/* Secondary animated layer for liquid feel */}
           <div style={{
             position: 'absolute',
             inset: 0,
@@ -109,11 +97,11 @@ export default function Contact() {
             animation: 'meshShift2 15s ease-in-out infinite alternate',
           }} />
         </div>
-        {/* Top fade to blend with page background */}
         <div className="absolute inset-0" style={{
           background: 'linear-gradient(to bottom, rgba(248,250,252, 1) 0%, rgba(248,250,252,0.4) 40%, transparent 100%)',
         }} />
       </motion.div>
+
       {/* Animation keyframes */}
       <style>{`
         @keyframes meshShift {
@@ -227,62 +215,47 @@ export default function Contact() {
           viewport={{ once: true }}
           className="mt-20 pt-16 border-t border-slate-200"
         >
-          <div className="flex justify-end mb-16 px-4 md:px-0">
-            <div className="w-full lg:w-3/4 grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div>
-                <h4 className="font-bold text-black mb-3">{t.footerOpeningHours}</h4>
-                <p className="text-slate-500 text-sm whitespace-pre-wrap leading-snug">{language === 'en' ? 'Mon - Fri: 10 a.m. - 6 p.m.\nSat - Sun: 10 a.m. - 6 p.m.' : 'સોમ - શુક્ર: સવારે 10 - સાંજે 6\nશનિ - રવિ: સવારે 10 - સાંજે 6'}</p>
+          {/* Footer columns — logo on left, info columns grouped on right */}
+          <div className="mb-12 px-4 md:px-0 flex flex-col lg:flex-row lg:justify-between lg:items-start gap-8">
+
+            {/* Logo + Brand Name */}
+            <div className=" flex justify-center items-center flex-col items-start gap-3 flex-shrink-0">
+              <div className="w-14 h-14 rounded-xl overflow-hidden bg-white shadow-md ring-1 ring-slate-200">
+                <img src="/images/Logo.jpg" alt="Ramkabir Auto Logo" className="w-full h-full object-cover" />
               </div>
-              <div>
-                <h4 className="font-bold text-black mb-3">{t.footerContact}</h4>
-                <p className="text-slate-500 text-sm mb-1">{language === 'en' ? '+91 98255 33573' : '+૯૧ ૯૮૨૫૫૩૩૫૭૩'}</p>
-                <p className="text-slate-500 text-sm">{language === 'en' ? 'Vimal Patel' : 'વિમલભાઈ પટેલ'}</p>
+              <span className="font-black text-[#1e3a5f] text-xl leading-tight">
+                Ramkabir Auto
+              </span>
+            </div>
+
+            {/* Three info columns — grouped tightly on the right */}
+            <div className="flex flex-wrap gap-x-10 gap-y-6 lg:justify-end">
+
+              {/* Opening Hours */}
+              <div className="min-w-[130px]">
+                <h4 className="font-bold text-black mb-2 text-lg">{t.footerOpeningHours}</h4>
+                <p className="text-slate-500 text-xs whitespace-pre-wrap leading-snug">{language === 'en' ? 'Mon - Fri: 10 a.m. - 6 p.m.\nSat - Sun: 10 a.m. - 6 p.m.' : 'સોમ - શુક્ર: સવારે 10 - સાંજે 6\nશનિ - રવિ: સવારે 10 - સાંજે 6'}</p>
               </div>
-              <div>
-                <h4 className="font-bold text-black mb-3">{t.footerGeneral}</h4>
-                <ul className="space-y-1.5">
-                  <li>
-                    <Link
-                      to="/"
-                      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                      className="text-slate-500 text-sm hover:text-black transition-colors"
-                    >
-                      {t.footerHome}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/inventory" className="text-slate-500 text-sm hover:text-black transition-colors">
-                      {t.footerInventory}
-                    </Link>
-                  </li>
-                  <li>
-                    <a
-                      href="/#about"
-                      onClick={(e) => {
-                        const aboutElement = document.getElementById('about');
-                        if (aboutElement) {
-                          e.preventDefault();
-                          aboutElement.scrollIntoView({ behavior: 'smooth' });
-                          // Optionally push state to keep URL updated
-                          window.history.pushState(null, '', '/#about');
-                        }
-                      }}
-                      className="text-slate-500 text-sm hover:text-black transition-colors"
-                    >
-                      {t.footerAbout}
-                    </a>
-                  </li>
-                </ul>
+
+              {/* Contact */}
+              <div className="min-w-[110px]">
+                <h4 className="font-bold text-black mb-2 text-lg">{t.footerContact}</h4>
+                <p className="text-slate-500 text-xs mb-1">{language === 'en' ? '+91 98255 33573' : '+૯૧ ૯૮૨૫૫૩૩૫૭૩'}</p>
+                <p className="text-slate-500 text-xs">{language === 'en' ? 'Vimal Patel' : 'વિમલભાઈ પટેલ'}</p>
               </div>
-              <div>
-                <h4 className="font-bold text-black mb-3">{t.footerLocation}</h4>
-                <p className="text-slate-500 text-sm leading-snug">
+
+              {/* Location */}
+              <div className="min-w-[160px] max-w-[200px]">
+                <h4 className="font-bold text-black mb-2 text-lg">{t.footerLocation}</h4>
+                <p className="text-slate-500 text-xs leading-snug">
                   {language === 'en' ? 'Nr APMC Market, NH 48, Sayajipura, Ajwa Road, Vadodara 390019' : 'APMC માર્કેટ નજીક, NH 48, સયાજીપુરા, અજવા રોડ, વડોદરા 390019'}
                 </p>
               </div>
+
             </div>
           </div>
 
+          {/* Big brand wordmark */}
           <div className="w-full px-4 overflow-visible">
             <h1
               className="w-full font-black text-[#7BD88A] leading-none tracking-tight text-center whitespace-normal break-words"
@@ -290,6 +263,11 @@ export default function Contact() {
             >
               Ramkabir Auto
             </h1>
+          </div>
+
+          {/* Copyright */}
+          <div className="mt-8 pt-6 border-t border-slate-200 text-center text-slate-400 text-xs px-4 md:px-0">
+            &copy; {new Date().getFullYear()} Ramkabir Auto. All rights reserved.
           </div>
         </motion.div>
       </div>
