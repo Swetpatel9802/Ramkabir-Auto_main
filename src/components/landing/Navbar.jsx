@@ -115,7 +115,7 @@ export default function Navbar() {
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={() => setLanguage(language === 'en' ? 'gu' : 'en')}
-            className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-white transition-all duration-300 hover:scale-105 active:scale-95"
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-white transition-colors duration-200"
             style={langBtnStyle}
           >
             <Globe className="w-4 h-4" />
@@ -163,12 +163,21 @@ export default function Navbar() {
         {/* Language toggle — with text on mobile */}
         <button
           onClick={() => setLanguage(language === 'en' ? 'gu' : 'en')}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-white flex-shrink-0 transition-all duration-300"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-white flex-shrink-0 transition-colors duration-200"
           style={langBtnStyle}
         >
           <Globe className="w-3.5 h-3.5 flex-shrink-0" />
           <span>{t.langLabel}</span>
         </button>
+
+        {/* Admin — mobile */}
+        <Link
+          to="/admin"
+          className="flex items-center justify-center w-8 h-8 rounded-lg text-white/40 hover:text-white/80 hover:bg-white/10 transition-all duration-200 flex-shrink-0"
+          aria-label="Admin Login"
+        >
+          <Settings className="w-4 h-4" />
+        </Link>
       </div>
 
     </nav>
