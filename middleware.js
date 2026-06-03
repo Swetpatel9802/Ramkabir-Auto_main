@@ -36,6 +36,11 @@ export default async function middleware(req) {
           const images = typeof p.images === 'string' ? JSON.parse(p.images) : p.images;
           if (images && images.length > 0) {
             imageUrl = images[0];
+            // Optimize Cloudinary image for WhatsApp/Facebook (JPG format, 1200x630, compressed)
+            if (imageUrl.includes('res.cloudinary.com')) {
+              imageUrl = imageUrl.replace('/upload/v', '/upload/w_1200,h_630,c_fill,f_jpg,q_80/v');
+              imageUrl = imageUrl.replace('/upload/ramkabir', '/upload/w_1200,h_630,c_fill,f_jpg,q_80/ramkabir'); // just in case no 'v' version
+            }
           }
         } catch (e) {
           // If parsing fails, use default logo
@@ -51,10 +56,16 @@ export default async function middleware(req) {
           <meta property="og:title" content="${title}" />
           <meta property="og:description" content="${description}" />
           <meta property="og:image" content="${imageUrl}" />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
           <meta property="og:type" content="website" />
           <meta property="og:url" content="${req.url}" />
           <meta name="twitter:card" content="summary_large_image" />
         `;
+        
+        // Remove the original generic tags to prevent WhatsApp from getting confused
+        html = html.replace(/<title>.*?<\/title>/i, '');
+        html = html.replace(/<meta\s+name=["']description["']\s+content=["'].*?["']\s*\/?>/i, '');
         
         html = html.replace('</head>', `${metaTags}</head>`);
       }
