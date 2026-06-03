@@ -1,4 +1,4 @@
-import { useLanguage } from '@/pages/Home';
+import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
 import { Shield, Users, Award, MapPin } from 'lucide-react';
 

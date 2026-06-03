@@ -1,20 +1,19 @@
 import React from 'react';
-import { useLanguage } from '@/pages/Home';
-import { Phone, ChevronDown } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
+import { ChevronDown, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 
 const content = {
   en: {
     headline: "Vadodara's Trusted Seller Of Old Tractors and Agricultural Equipment",
     subheadline: "Seller of Swaraj, Mahindra, Sonalika, and more.",
-    cta: "Call for Best Price",
+    cta: "Browse Inventory",
     scroll: "Explore More"
   },
   gu: {
     headline: "વડોદરા ના જાનીતા અને વિશ્વસુ જુના ટ્રેક્ટર અને ખેતી ના સધાનો ના વેપારી",
     subheadline: "સ્વરાજ, મહિન્દ્રા, સોનાલીકા, અને વધુ માટે અધિકૃત ડીલર.",
-    cta: "શ્રેષ્ઠ ભાવ માટે કૉલ કરો",
+    cta: "અમારી ઈન્વેન્ટરી જુઓ",
     scroll: "વધુ જુઓ"
   }
 };
@@ -87,10 +86,11 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.6 }}
         >
           <a
-            href="tel:9825533573"
+            href="#tractors"
+            onClick={(e) => { e.preventDefault(); document.getElementById('tractors')?.scrollIntoView({ behavior: 'smooth' }); }}
             className="inline-flex items-center gap-3 bg-[#e85d04] hover:bg-[#d14f00] text-white px-10 py-5 rounded-full text-lg font-bold shadow-2xl shadow-[#e85d04]/30 hover:shadow-[#e85d04]/50 transition-all duration-300 hover:scale-105 active:scale-95"
           >
-            <Phone className="w-6 h-6" />
+            <Package className="w-6 h-6" />
             {t.cta}
           </a>
         </motion.div>

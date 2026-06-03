@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLanguage } from '@/pages/Home';
+import { useLanguage } from '@/context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, ChevronLeft, ChevronRight, Quote, X, PenLine, Mic, MicOff } from 'lucide-react';
 import { fetchReviews, submitReview } from '@/api/reviews';
@@ -81,6 +81,9 @@ export default function Testimonials() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [itemsPerView, setItemsPerView] = useState(() => (
+    typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 3
+  ));
   const [formState, setFormState] = useState({ name: '', location: '', rating: 5, text: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
@@ -94,6 +97,24 @@ export default function Testimonials() {
     }
     setListeningField(null);
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setItemsPerView(window.innerWidth < 768 ? 1 : 3);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => () => stopListening(), []);
+
+  useEffect(() => {
+    if (!isModalOpen && listeningField) {
+      stopListening();
+    }
+  }, [isModalOpen, listeningField]);
 
   const toggleListening = (field) => {
     // If already listening on this field, stop
@@ -164,22 +185,32 @@ export default function Testimonials() {
     }
   };
 
-  const itemsPerView = typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 3;
-
   const next = () => {
+    if (reviews.length === 0) return;
     setDirection(1);
     setCurrentIndex((prev) => (prev + 1) % reviews.length);
   };
 
   const prev = () => {
+    if (reviews.length === 0) return;
     setDirection(-1);
     setCurrentIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
   };
 
   useEffect(() => {
+    if (reviews.length <= itemsPerView) return;
     const timer = setInterval(next, 8000);
     return () => clearInterval(timer);
-  }, [reviews.length]); // Re-run when reviews change
+  }, [reviews.length, itemsPerView]); // Re-run when reviews change
+
+  useEffect(() => {
+    if (reviews.length === 0) {
+      setCurrentIndex(0);
+      return;
+    }
+
+    setCurrentIndex((prev) => prev % reviews.length);
+  }, [reviews.length]);
 
   const getVisibleReviews = () => {
     if (reviews.length === 0) return [];

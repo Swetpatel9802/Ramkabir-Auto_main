@@ -1,10 +1,10 @@
 import React from 'react';
-import { useLanguage } from '@/pages/Home';
+import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Eye, ArrowRight, Truck, ShoppingCart, Wrench } from 'lucide-react';
-import { fetchBrandsByCategory, fetchTractors } from '@/api/tractors';
+import { fetchBrandsByCategory, fetchInventoryCount } from '@/api/tractors';
 
 const content = {
   en: {
@@ -73,7 +73,7 @@ const BRAND_LOGOS = {
   'Mahindra': '/images/brands/Mahindra.png',
   'John Deere': '/images/brands/John deere.jpeg',
   'Massey Ferguson': '/images/brands/Massey.png',
-  'Massey': 'public/images/brands/Massey.png',
+  'Massey': '/images/brands/Massey.png',
   'New Holland': '/images/brands/New Holland.png',
   'Sonalika': '/images/brands/Sonalika.png',
   'Swaraj': '/images/brands/Swaraj.jpg',
@@ -172,10 +172,10 @@ function InventoryBanner({ language }) {
 
   const { data: allProducts } = useQuery({
     queryKey: ['allProductsCount'],
-    queryFn: fetchTractors,
+    queryFn: fetchInventoryCount,
   });
 
-  const totalCount = allProducts?.length || 0;
+  const totalCount = allProducts || 0;
 
   return (
     <motion.div
@@ -256,7 +256,6 @@ function InventoryBanner({ language }) {
 
 export default function Tractors() {
   const { language } = useLanguage();
-  const navigate = useNavigate();
   const t = content[language];
 
   return (

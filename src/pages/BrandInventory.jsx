@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -7,7 +7,7 @@ import { fetchProductsByBrand } from '@/api/tractors';
 import TractorCard from '@/components/landing/TractorCard';
 import WhatsAppButton from '@/components/landing/WhatsAppButton';
 import LanguageToggle from '@/components/landing/LanguageToggle';
-import { LanguageContext } from '@/pages/Home';
+import { useLanguage } from '@/context/LanguageContext';
 
 const pageContent = {
     en: {
@@ -38,7 +38,7 @@ const categoryLabels = {
 export default function BrandInventory() {
     const { vehicleType, brand } = useParams();
     const navigate = useNavigate();
-    const [language, setLanguage] = useState('en');
+    const { language } = useLanguage();
     const t = pageContent[language];
     const decodedBrand = decodeURIComponent(brand);
 
@@ -48,9 +48,8 @@ export default function BrandInventory() {
     });
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage }}>
-            <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white font-sans">
-                <LanguageToggle />
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white font-sans">
+            <LanguageToggle />
 
                 {/* Header */}
                 <div className="bg-[#1e3a5f] text-white">
@@ -130,6 +129,5 @@ export default function BrandInventory() {
 
                 <WhatsAppButton />
             </div>
-        </LanguageContext.Provider>
     );
 }

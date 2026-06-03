@@ -18,13 +18,13 @@ const featureLabels = {
     en: {
         power_steering: 'Power Steering', '4wd': '4WD', new_battery: 'New Battery',
         recently_serviced: 'Recently Serviced', finance_available: 'Finance Available',
-        single_owner: 'Single Owner', new_tyres: 'New Tyres', ac_cabin: 'AC Cabin',
+        single_owner: 'Single Owner', new_tyres: 'New Tyres', remould_tyres: 'Remould Tyres', ac_cabin: 'AC Cabin',
         warranty: 'Warranty Available', verified: 'Verified Inspection',
     },
     gu: {
         power_steering: 'પાવર સ્ટીયરિંગ', '4wd': '4WD', new_battery: 'નવી બેટરી',
         recently_serviced: 'તાજેતરમાં સર્વિસ', finance_available: 'ફાઇનાન્સ ઉપલબ્ધ',
-        single_owner: 'એક માલિક', new_tyres: 'નવા ટાયર', ac_cabin: 'AC કેબિન',
+        single_owner: 'એક માલિક', new_tyres: 'નવા ટાયર', remould_tyres: 'રીમોલ્ડ ટાયર', ac_cabin: 'AC કેબિન',
         warranty: 'વોરંટી ઉપલબ્ધ', verified: 'ચકાસાયેલ નિરીક્ષણ',
     }
 };
@@ -40,6 +40,7 @@ const PUBLIC_COLUMNS = `
 const mapTractorToUI = (tractor) => {
     const details = tractor.product_details || {};
     const hasCustomFeatures = details.features && details.features.length > 0;
+    const parsedImages = parseImages(tractor.images);
 
     const buildFeatures = (lang) => {
         if (hasCustomFeatures) {
@@ -59,8 +60,8 @@ const mapTractorToUI = (tractor) => {
             en: tractor.model_number || 'Unknown Model',
             gu: tractor.model_number || 'અજ્ઞાત મોડેલ'
         },
-        images: parseImages(tractor.images).length > 0
-            ? parseImages(tractor.images)
+        images: parsedImages.length > 0
+            ? parsedImages
             : ['/images/placeholder.jpg'],
         specs: {
             manufacturing_date: tractor.manufacturing_date || tractor.parsing_year || 'N/A',
@@ -97,6 +98,15 @@ export const fetchBrandsByCategory = async (vehicleType) => {
 
     const brands = [...new Set(data.map(item => item.make).filter(Boolean))];
     return brands.sort();
+};
+
+export const fetchInventoryCount = async () => {
+    const { count, error } = await supabase
+        .from('public_tractors')
+        .select('id', { count: 'exact', head: true });
+
+    if (error) throw new Error(error.message);
+    return count || 0;
 };
 
 // Fetch all available products grouped by vehicle_type

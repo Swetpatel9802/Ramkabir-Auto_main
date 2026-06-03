@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLanguage } from '@/pages/Home';
+import { useLanguage } from '@/context/LanguageContext';
 import { Globe, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

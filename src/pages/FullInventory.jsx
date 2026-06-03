@@ -7,7 +7,7 @@ import { fetchAllInventory } from '@/api/tractors';
 import TractorCard from '@/components/landing/TractorCard';
 import WhatsAppButton from '@/components/landing/WhatsAppButton';
 import LanguageToggle from '@/components/landing/LanguageToggle';
-import { LanguageContext } from '@/pages/Home';
+import { useLanguage } from '@/context/LanguageContext';
 
 const pageContent = {
     en: {
@@ -54,7 +54,7 @@ const CATEGORIES = ['Tractor', 'Trolley', 'Other'];
 
 export default function FullInventory() {
     const navigate = useNavigate();
-    const [language, setLanguage] = useState('gu');
+    const { language } = useLanguage();
     const [activeTab, setActiveTab] = useState('All');
     const t = pageContent[language];
 
@@ -82,8 +82,7 @@ export default function FullInventory() {
     };
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage }}>
-            <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white font-sans">
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white font-sans">
                 <LanguageToggle />
 
                 {/* Header */}
@@ -239,6 +238,5 @@ export default function FullInventory() {
 
                 <WhatsAppButton />
             </div>
-        </LanguageContext.Provider>
     );
 }

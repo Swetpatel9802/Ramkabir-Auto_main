@@ -6,7 +6,7 @@ import { ArrowLeft, Phone, MessageSquare, ChevronLeft, ChevronRight, X, Share2, 
 import { fetchProductById } from '@/api/tractors';
 import WhatsAppButton from '@/components/landing/WhatsAppButton';
 import LanguageToggle from '@/components/landing/LanguageToggle';
-import { LanguageContext } from '@/pages/Home';
+import { useLanguage } from '@/context/LanguageContext';
 
 const pageContent = {
     en: {
@@ -70,12 +70,13 @@ export default function ProductPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
-    const [language, setLanguage] = useState('gu');
+    const { language } = useLanguage();
     const t = pageContent[language];
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [fullscreenImage, setFullscreenImage] = useState(false);
     const [showCopied, setShowCopied] = useState(false);
+    const [isMainImageLoading, setIsMainImageLoading] = useState(true);
     const returnPath = location.state?.from || '/inventory';
 
     const { data: tractor, isLoading, error } = useQuery({
@@ -110,11 +111,13 @@ export default function ProductPage() {
 
     const nextImage = useCallback(() => {
         if (!tractor) return;
+        setIsMainImageLoading(true);
         setCurrentImageIndex((prev) => (prev + 1) % tractor.images.length);
     }, [tractor]);
 
     const prevImage = useCallback(() => {
         if (!tractor) return;
+        setIsMainImageLoading(true);
         setCurrentImageIndex((prev) => (prev - 1 + tractor.images.length) % tractor.images.length);
     }, [tractor]);
 
@@ -170,38 +173,33 @@ export default function ProductPage() {
 
     if (isLoading) {
         return (
-            <LanguageContext.Provider value={{ language, setLanguage }}>
-                <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
-                    <div className="text-xl text-slate-500 animate-pulse">{t.loading}</div>
-                </div>
-            </LanguageContext.Provider>
+            <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
+                <div className="text-xl text-slate-500 animate-pulse">{t.loading}</div>
+            </div>
         );
     }
 
     if (error || !tractor) {
         return (
-            <LanguageContext.Provider value={{ language, setLanguage }}>
-                <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
-                    <LanguageToggle />
-                    <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
-                    <div className="text-xl text-slate-700 mb-6 font-semibold">{t.error}</div>
-                    <button
-                        onClick={handleBack}
-                        className="flex items-center gap-2 bg-[#1e3a5f] text-white px-6 py-3 rounded-full hover:bg-[#1e3a5f]/90 transition-colors"
-                    >
-                        <ArrowLeft className="w-5 h-5" />
-                        {t.backToInventory}
-                    </button>
-                </div>
-            </LanguageContext.Provider>
+            <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
+                <LanguageToggle />
+                <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+                <div className="text-xl text-slate-700 mb-6 font-semibold">{t.error}</div>
+                <button
+                    onClick={handleBack}
+                    className="flex items-center gap-2 bg-[#1e3a5f] text-white px-6 py-3 rounded-full hover:bg-[#1e3a5f]/90 transition-colors"
+                >
+                    <ArrowLeft className="w-5 h-5" />
+                    {t.backToInventory}
+                </button>
+            </div>
         );
     }
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage }}>
-            <div className="min-h-screen bg-slate-50 font-sans pb-20">
-                <LanguageToggle />
-                <WhatsAppButton />
+        <div className="min-h-screen bg-slate-50 font-sans pb-20">
+            <LanguageToggle />
+            <WhatsAppButton />
 
                 {/* Header Navbar */}
                 <div className="bg-[#1e3a5f] text-white sticky top-0 z-30 shadow-md">
@@ -253,12 +251,17 @@ export default function ProductPage() {
                     </div>
 
                     {/* Image Gallery */}
-                    <div className="relative h-72 sm:h-96 bg-slate-100 overflow-hidden">
+                    <div className="relative h-72 sm:h-96 bg-slate-200 overflow-hidden">
+                        {isMainImageLoading && (
+                            <div className="absolute inset-0 animate-pulse bg-slate-300 z-0" />
+                        )}
                         <motion.img
                             key={currentImageIndex}
                             src={tractor.images[currentImageIndex]}
                             alt={tractor.model[language]}
-                            className="w-full h-full object-cover cursor-zoom-in touch-pan-y"
+                            loading="lazy"
+                            onLoad={() => setIsMainImageLoading(false)}
+                            className={`w-full h-full object-cover cursor-zoom-in touch-pan-y relative z-10 transition-opacity duration-300 ${isMainImageLoading ? 'opacity-0' : 'opacity-100'}`}
                             onClick={openFullscreen}
                             drag={tractor.images.length > 1 ? "x" : false}
                             dragConstraints={{ left: 0, right: 0 }}
@@ -286,7 +289,10 @@ export default function ProductPage() {
                                     {tractor.images.map((_, idx) => (
                                         <button
                                             key={idx}
-                                            onClick={() => setCurrentImageIndex(idx)}
+                                            onClick={() => {
+                                                if (idx !== currentImageIndex) setIsMainImageLoading(true);
+                                                setCurrentImageIndex(idx);
+                                            }}
                                             className={`w-2 h-2 rounded-full transition-all ${idx === currentImageIndex ? 'bg-white w-6' : 'bg-white/50'
                                                 }`}
                                         />
@@ -453,6 +459,5 @@ export default function ProductPage() {
                     )}
                 </AnimatePresence>
             </div>
-        </LanguageContext.Provider>
     );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useLanguage } from '@/pages/Home';
+import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
 import { MessageSquare, Share2 } from 'lucide-react';
 
@@ -9,6 +9,7 @@ export default function TractorCard({ tractor }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [showCopied, setShowCopied] = useState(false);
+  const [isLoadingImage, setIsLoadingImage] = useState(true);
 
   const openProductPage = () => {
     navigate(`/product/${tractor.id}`, {
@@ -64,11 +65,16 @@ export default function TractorCard({ tractor }) {
       className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer group"
       onClick={openProductPage}
     >
-      <div className="relative h-56 overflow-hidden">
+      <div className="relative h-56 overflow-hidden bg-slate-200">
+        {isLoadingImage && (
+            <div className="absolute inset-0 animate-pulse bg-slate-300 z-0" />
+        )}
         <img
           src={tractor.images[0]}
           alt={tractor.model[language]}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          loading="lazy"
+          onLoad={() => setIsLoadingImage(false)}
+          className={`w-full h-full object-cover group-hover:scale-110 transition-all duration-500 relative z-10 ${isLoadingImage ? 'opacity-0' : 'opacity-100'}`}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-bold text-[#1e3a5f]">

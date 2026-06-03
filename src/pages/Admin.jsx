@@ -321,8 +321,6 @@ export default function Admin() {
         );
     }
 
-    const selectedTractor = tractors.find(t => t.id === selectedTractorId);
-
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white font-sans">
             {/* Header */}
