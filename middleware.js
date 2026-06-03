@@ -32,18 +32,29 @@ export default async function middleware(req) {
         const p = products[0];
         
         let imageUrl = 'https://ramkabir-auto.com/images/Logo.jpg';
-        try {
-          const images = typeof p.images === 'string' ? JSON.parse(p.images) : p.images;
-          if (images && images.length > 0) {
-            imageUrl = images[0];
-            // Optimize Cloudinary image for WhatsApp/Facebook (JPG format, 1200x630, compressed)
-            if (imageUrl.includes('res.cloudinary.com')) {
-              imageUrl = imageUrl.replace('/upload/v', '/upload/w_1200,h_630,c_fill,f_jpg,q_80/v');
-              imageUrl = imageUrl.replace('/upload/ramkabir', '/upload/w_1200,h_630,c_fill,f_jpg,q_80/ramkabir'); // just in case no 'v' version
+        
+        let parsedImages = [];
+        if (Array.isArray(p.images)) {
+          parsedImages = p.images;
+        } else if (typeof p.images === 'string') {
+          try {
+            parsedImages = JSON.parse(p.images);
+            if (!Array.isArray(parsedImages)) parsedImages = [p.images]; // Just in case it parsed to a non-array
+          } catch (e) {
+            parsedImages = [p.images]; // It was just a plain string URL
+          }
+        }
+
+        if (parsedImages && parsedImages.length > 0 && typeof parsedImages[0] === 'string') {
+          imageUrl = parsedImages[0];
+          // Optimize Cloudinary image for WhatsApp/Facebook (JPG format, 1200x630, compressed)
+          if (imageUrl.includes('res.cloudinary.com')) {
+            if (imageUrl.includes('/upload/v')) {
+                imageUrl = imageUrl.replace('/upload/v', '/upload/w_1200,h_630,c_fill,f_jpg,q_80/v');
+            } else if (imageUrl.includes('/upload/ramkabir')) {
+                imageUrl = imageUrl.replace('/upload/ramkabir', '/upload/w_1200,h_630,c_fill,f_jpg,q_80/ramkabir');
             }
           }
-        } catch (e) {
-          // If parsing fails, use default logo
         }
 
         const title = `${p.make} ${p.model_number} | Ramkabir Auto`;
