@@ -8,7 +8,6 @@ import TractorCard from '@/components/landing/TractorCard';
 import WhatsAppButton from '@/components/landing/WhatsAppButton';
 import LanguageToggle from '@/components/landing/LanguageToggle';
 import { useLanguage } from '@/context/LanguageContext';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const pageContent = {
     en: {
@@ -42,8 +41,6 @@ export default function BrandInventory() {
     const { language } = useLanguage();
     const t = pageContent[language];
     const decodedBrand = decodeURIComponent(brand);
-
-    useDocumentTitle(`${decodedBrand} ${vehicleType || 'Products'} | Ramkabir Auto`);
 
     const { data: products, isLoading, error } = useQuery({
         queryKey: ['products', vehicleType, decodedBrand],

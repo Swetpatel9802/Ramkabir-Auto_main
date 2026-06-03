@@ -8,7 +8,6 @@ import TractorCard from '@/components/landing/TractorCard';
 import WhatsAppButton from '@/components/landing/WhatsAppButton';
 import LanguageToggle from '@/components/landing/LanguageToggle';
 import { useLanguage } from '@/context/LanguageContext';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const pageContent = {
     en: {
@@ -58,8 +57,6 @@ export default function FullInventory() {
     const { language } = useLanguage();
     const [activeTab, setActiveTab] = useState('All');
     const t = pageContent[language];
-
-    useDocumentTitle(language === 'en' ? 'Full Inventory | Ramkabir Auto' : 'સંપૂર્ણ ઇન્વેન્ટરી | Ramkabir Auto');
 
     const { data: inventory, isLoading, error } = useQuery({
         queryKey: ['fullInventory'],
