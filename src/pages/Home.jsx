@@ -5,11 +5,14 @@ import Brands from '@/components/landing/Brand';
 import Tractors from '@/components/landing/Tractors';
 import Testimonials from '@/components/landing/Testimonials';
 import Contact from '@/components/landing/Contact';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import WhatsAppButton from '@/components/landing/WhatsAppButton';
 
 import Navbar from '@/components/landing/Navbar';
 
 export default function Home() {
+  useDocumentTitle('Ramkabir Auto | Trusted Seller Of Old Tractors');
+
   return (
     <div className="min-h-screen bg-white font-sans">
         {/* Transparent Navbar */}

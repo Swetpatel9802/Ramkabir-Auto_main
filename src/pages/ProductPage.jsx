@@ -7,6 +7,7 @@ import { fetchProductById } from '@/api/tractors';
 import WhatsAppButton from '@/components/landing/WhatsAppButton';
 import LanguageToggle from '@/components/landing/LanguageToggle';
 import { useLanguage } from '@/context/LanguageContext';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const pageContent = {
     en: {
@@ -84,6 +85,8 @@ export default function ProductPage() {
         queryFn: () => fetchProductById(id),
         retry: 1
     });
+
+    useDocumentTitle(tractor ? `${tractor.brand} ${tractor.model?.[language] || tractor.model?.en || ''} | Ramkabir Auto` : 'Product | Ramkabir Auto');
 
     // Handle history pushstate for browser back button explicitly going to inventory
     // when clicking the built-in back button, but intercepting it for fullscreen image
