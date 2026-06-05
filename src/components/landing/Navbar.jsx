@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { Globe, Settings } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const content = {
@@ -43,8 +43,8 @@ export default function Navbar() {
 
   const navLinks = [
     { label: t.home, targetId: 'top' },
-    { label: t.about, targetId: 'about' },
     { label: t.vehicles, targetId: 'tractors' },
+    { label: t.about, targetId: 'about' },
     { label: t.contact, targetId: 'contact', isHighlighted: true },
   ];
 
@@ -111,7 +111,7 @@ export default function Navbar() {
           )}
         </ul>
 
-        {/* Language + Admin */}
+        {/* Language */}
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={() => setLanguage(language === 'en' ? 'gu' : 'en')}
@@ -121,13 +121,6 @@ export default function Navbar() {
             <Globe className="w-4 h-4" />
             {t.langLabel}
           </button>
-          <Link
-            to="/admin"
-            className="flex items-center gap-1.5 text-white/40 hover:text-white/85 text-xs font-medium px-2.5 py-2 rounded-lg hover:bg-white/10 transition-all duration-200"
-          >
-            <Settings className="w-3.5 h-3.5" />
-            Admin
-          </Link>
         </div>
       </div>
 
@@ -170,14 +163,7 @@ export default function Navbar() {
           <span>{t.langLabel}</span>
         </button>
 
-        {/* Admin — mobile */}
-        <Link
-          to="/admin"
-          className="flex items-center justify-center w-8 h-8 rounded-lg text-white/40 hover:text-white/80 hover:bg-white/10 transition-all duration-200 flex-shrink-0"
-          aria-label="Admin Login"
-        >
-          <Settings className="w-4 h-4" />
-        </Link>
+
       </div>
 
     </nav>
