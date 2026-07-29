@@ -80,6 +80,7 @@ const BRAND_LOGOS = {
   'Eicher': '/images/brands/eicher.png',
   'Farmtrac': '/images/brands/Farmtrac.png',
   'Kubota': '/images/brands/Kubota.png',
+  'Powertrac': '/images/brands/Powertrac.png'
 };
 
 function BrandCard({ brand, vehicleType, index }) {
