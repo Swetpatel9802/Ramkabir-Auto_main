@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
@@ -79,7 +79,7 @@ const BRAND_LOGOS = {
   'Swaraj': '/images/brands/Swaraj.jpg',
   'Eicher': '/images/brands/eicher.png',
   'Farmtrac': '/images/brands/Farmtrac.png',
-  'Kubota': '/images/brands/Kubota.png',
+  'Kubota': '/images/brands/Kubota.jpeg',
   'Powertrac': '/images/brands/Powertrac.png'
 };
 
@@ -87,6 +87,7 @@ function BrandCard({ brand, vehicleType, index }) {
   const navigate = useNavigate();
   const color = CATEGORY_COLORS[vehicleType] || '#e10202ff';
   const logo = BRAND_LOGOS[brand];
+  const [imgError, setImgError] = useState(false);
 
   return (
     <motion.div
@@ -101,8 +102,13 @@ function BrandCard({ brand, vehicleType, index }) {
       onMouseLeave={(e) => e.currentTarget.style.borderColor = ''}
     >
       <div className="flex items-center justify-center h-24 mb-4">
-        {logo ? (
-          <img src={logo} alt={brand} className="max-h-20 max-w-full object-contain group-hover:scale-110 transition-transform duration-300" />
+        {logo && !imgError ? (
+          <img
+            src={logo}
+            alt={brand}
+            className="max-h-20 max-w-full object-contain group-hover:scale-110 transition-transform duration-300"
+            onError={() => setImgError(true)}
+          />
         ) : (
           <span className="text-2xl md:text-3xl font-black text-[#1e3a5f] transition-colors duration-300 text-center">
             {brand}
